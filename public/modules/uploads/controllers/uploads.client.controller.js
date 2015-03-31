@@ -1,65 +1,71 @@
 'use strict';
 
 // Uploads controller
-angular.module('uploads').controller('UploadsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Uploads',
-	function($scope, $stateParams, $location, Authentication, Uploads ) {
-		$scope.authentication = Authentication;
+angular.module('uploads').controller('UploadsController',
+    ['$scope', '$stateParams', '$location', 'Authentication', 'Uploads','flowFactory',
+    function($scope, $stateParams, $location, Authentication, Uploads, flowFactory) {
+        $scope.authentication = Authentication;
 
-		// Create new Upload
-		$scope.create = function() {
-			// Create new Upload object
-			var upload = new Uploads ({
-				name: this.name
-			});
+        $scope.addFile = function(file) {
+            $scope.upload.files.push(file.name);
+            $scope.update();
+        };
 
-			// Redirect after save
-			upload.$save(function(response) {
-				$location.path('uploads/' + response._id);
+        // Create new Upload
+        $scope.create = function() {
+            // Create new Upload object
+            var upload = new Uploads ({
+                name: this.name
+            });
 
-				// Clear form fields
-				$scope.name = '';
-			}, function(errorResponse) {
-				$scope.error = errorResponse.data.message;
-			});
-		};
+            // Redirect after save
+            upload.$save(function(response) {
+                $location.path('uploads/' + response._id);
 
-		// Remove existing Upload
-		$scope.remove = function( upload ) {
-			if ( upload ) { upload.$remove();
+                // Clear form fields
+                $scope.name = '';
+            }, function(errorResponse) {
+                $scope.error = errorResponse.data.message;
+            });
+        };
 
-				for (var i in $scope.uploads ) {
-					if ($scope.uploads [i] === upload ) {
-						$scope.uploads.splice(i, 1);
-					}
-				}
-			} else {
-				$scope.upload.$remove(function() {
-					$location.path('uploads');
-				});
-			}
-		};
+        // Remove existing Upload
+        $scope.remove = function( upload ) {
+            if ( upload ) { upload.$remove();
 
-		// Update existing Upload
-		$scope.update = function() {
-			var upload = $scope.upload ;
+                for (var i in $scope.uploads ) {
+                    if ($scope.uploads [i] === upload ) {
+                        $scope.uploads.splice(i, 1);
+                    }
+                }
+            } else {
+                $scope.upload.$remove(function() {
+                    $location.path('uploads');
+                });
+            }
+        };
 
-			upload.$update(function() {
-				$location.path('uploads/' + upload._id);
-			}, function(errorResponse) {
-				$scope.error = errorResponse.data.message;
-			});
-		};
+        // Update existing Upload
+        $scope.update = function() {
+            var upload = $scope.upload ;
 
-		// Find a list of Uploads
-		$scope.find = function() {
-			$scope.uploads = Uploads.query();
-		};
+            upload.$update(function() {
+                $location.path('uploads/' + upload._id);
+            }, function(errorResponse) {
+                $scope.error = errorResponse.data.message;
+            });
+        };
 
-		// Find existing Upload
-		$scope.findOne = function() {
-			$scope.upload = Uploads.get({ 
-				uploadId: $stateParams.uploadId
-			});
-		};
-	}
+        // Find a list of Uploads
+        $scope.find = function() {
+            $scope.uploads = Uploads.query();
+        };
+
+        // Find existing Upload
+        $scope.findOne = function() {
+            $scope.upload = Uploads.get({
+                uploadId: $stateParams.uploadId
+            });
+        };
+    }
 ]);

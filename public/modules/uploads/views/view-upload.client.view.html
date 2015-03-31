@@ -1,21 +1,47 @@
 <section data-ng-controller="UploadsController" data-ng-init="findOne()">
-	<div class="page-header">
-		<h1 data-ng-bind="upload.name"></h1>
-	</div>
-	<div class="pull-right" data-ng-show="authentication.user._id == upload.user._id">
-		<a class="btn btn-primary" href="/#!/uploads/{{upload._id}}/edit">
-			<i class="glyphicon glyphicon-edit"></i>
-		</a>
-		<a class="btn btn-primary" data-ng-click="remove();">
-			<i class="glyphicon glyphicon-trash"></i>
-		</a>
-	</div>
-	<small>
-		<em class="text-muted">
-			Posted on
-			<span data-ng-bind="upload.created | date:'mediumDate'"></span>
-			by
-			<span data-ng-bind="upload.user.displayName"></span>
-		</em>
-	</small>
+    <div class="page-header">
+        <h1 data-ng-bind="upload.name"></h1>
+    </div>
+    <div class="pull-right" data-ng-show="authentication.user._id == upload.user._id">
+        <a class="btn btn-primary" href="/#!/uploads/{{upload._id}}/edit">
+            <i class="glyphicon glyphicon-edit"></i>
+        </a>
+        <a class="btn btn-primary" data-ng-click="remove();">
+            <i class="glyphicon glyphicon-trash"></i>
+        </a>
+    </div>
+    <div flow-init="{target: '/upload'}"
+        flow-files-submitted="$flow.upload()"
+        flow-file-success="addFile($file)">
+        <div class="drop" flow-drop="" ng-class="dropClass">
+            <span class="btn btn-default" flow-btn="">Upload File<input type="file" multiple="multiple" style="visibility: hidden; position: absolute;"></span>
+            <span class="btn btn-default" flow-btn="" flow-directory="" ng-show="$flow.supportDirectory">Upload Folder<input type="file" multiple="multiple" webkitdirectory="webkitdirectory" style="visibility: hidden; position: absolute;"></span>
+            <b>OR</b>
+            Drag And Drop your file here
+        </div>
+        <div class="well">
+            <a class="btn btn-small btn-success" ng-click="$flow.resume()">Resume all</a>
+            <a class="btn btn-small btn-danger" ng-click="$flow.pause()">Pause all</a>
+            <a class="btn btn-small btn-info" ng-click="$flow.cancel()">Cancel uploads / clear</a>
+            <span class="label label-info">Total Size: {{$flow.getSize()}}b</span>
+            <span class="label label-info">Is Uploading: {{$flow.isUploading()}}</span>
+        </div>
+        <div ng-repeat="file in $flow.files">
+            <div>{{$index+1}}</div>
+            <div>{{file.name}}</div>
+            <div>{{file.progress()*100}}% Done</div>
+            <div>{{file.filename}}</div>
+        </div>
+        <div ng-repeat="file in upload.files | unique ">
+            <a target="_blank" href="/download/{{file}}">{{file}}</a>
+        </div>
+    </div>
+    <small>
+        <em class="text-muted">
+            Posted on
+            <span data-ng-bind="upload.created | date:'mediumDate'"></span>
+            by
+            <span data-ng-bind="upload.user.displayName"></span>
+        </em>
+    </small>
 </section>
